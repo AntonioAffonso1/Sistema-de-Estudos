@@ -300,5 +300,7 @@ def estatisticas():
     print()
     print("--------------------------------------------")
     menu()
-# inicio real do codigo
+
+
+# inicio real do codigo - onde a função inicial é chamada e da inicio ao programa.
 menu()
