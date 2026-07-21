@@ -15,6 +15,8 @@ def main():
            editarTarefa()
         elif entrada == 5 :
            excluirTarefa()
+        elif entrada == 6 :
+           estatisticas()
         elif entrada == 0 :
             print("Saindo...")
             break
@@ -30,6 +32,7 @@ def menu():
     print("3 = Marcar como concluido")
     print("4 = Editar Tarefa")
     print("5 = Excluir Tarefa")
+    print("6 = Exibir Estatisticas")
     print("0 = Sair")
     print('\n')
     print("------------------------------------------")
@@ -79,7 +82,7 @@ def listarMenu() :
     if filtro == 1 :
        if not tarefas:
         print("Nenhuma tarefa cadastrada.")
-        return
+        return menu()
        else :
         for i, tarefa in enumerate(tarefas):
          print(f'\nID: {i}')
@@ -93,7 +96,7 @@ def listarMenu() :
     if filtro == 2 :
        if not tarefas:
         print("Nenhuma tarefa cadastrada.")
-        return
+        return menu()
        else :
           disc = input("Informe a Disciplina: ")
 
@@ -114,7 +117,7 @@ def listarMenu() :
     if filtro == 3 :
        if not tarefas:
           print("Nenhuma tarefa cadastrada.")
-          return
+          return menu()
        else :
           prior = input("Informe a Prioridade: ")
 
@@ -141,7 +144,7 @@ def statusMenu() :
     
     if not tarefas :
        print("Nnehuma tarefa encontrada.")
-       return
+       return menu()
     else:
        for i, tarefa in enumerate(tarefas):
          print(f'\nID: {i}')
@@ -179,7 +182,7 @@ def editarTarefa() :
 
     if not tarefas:
         print("Nenhuma tarefa cadastrada.")
-        return
+        return menu()
     else :
         for i, tarefa in enumerate(tarefas):
          print(f'\nID: {i}')
@@ -228,7 +231,7 @@ def excluirTarefa() :
    print('\n')
    if not tarefas:
         print("Nenhuma tarefa cadastrada.")
-        return
+        return menu()
    else :
         for i, tarefa in enumerate(tarefas):
          print(f'\nID: {i}')
@@ -255,5 +258,47 @@ def excluirTarefa() :
    print("------------------------------------------")
    menu()
 
+# função exibir estatisticas - para mostrar o resumo/estatisticas das tarefas
+def estatisticas():
+    print("-------------- |Estatísticas| --------------")
+    print()
+
+    if not tarefas:
+        print("Nenhuma tarefa cadastrada.")
+        return menu()
+
+    concluidas = 0
+    pendentes = 0
+    disciplinas = {}
+
+    # Percorre todas as tarefas
+    for tarefa in tarefas:
+
+        # Conta o status
+        if tarefa["status"] == "Concluída":
+            concluidas += 1
+        else:
+            pendentes += 1
+
+        # Conta as disciplinas
+        disciplina = tarefa["disciplina"]
+
+        if disciplina in disciplinas:
+            disciplinas[disciplina] += 1
+        else:
+            disciplinas[disciplina] = 1
+
+    # Exibe o resumo
+    print(f"Total de tarefas: {len(tarefas)}")
+    print(f"Tarefas concluídas: {concluidas}")
+    print(f"Tarefas pendentes: {pendentes}")
+
+    print("\nQuantidade por disciplina:")
+    for disciplina, quantidade in disciplinas.items():
+        print(f"{disciplina}: {quantidade}")
+
+    print()
+    print("--------------------------------------------")
+    menu()
 # inicio real do codigo
 menu()
