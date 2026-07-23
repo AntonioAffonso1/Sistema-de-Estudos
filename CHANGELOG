@@ -3,6 +3,10 @@ Changelog (Registro de Mudanças)
 AVISO!: Este arquivo apenas serve para documentar mudanças do programa, para versões finais completas da primeira//segunda etapa
 deve ser documentada via release.
 
+v0.1.8 (Stable) - 23/07/2026
+    - Introdução do sistema de login: ao iniciar o programa, é mostrada uma tela para logar, cadastrar ou sair.
+    - Cada usuario possui seus dados de forma separada (tarefas, grade etc)
+
 v0.1.5 (Stable) - 22/07/2026 
     - Introdução das Classes: Tarefa(obj) e Usuario
     - Adaptação completa para as classes | substituição de tarefa como variavel temporaria/local
