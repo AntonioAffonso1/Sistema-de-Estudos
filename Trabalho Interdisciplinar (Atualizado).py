@@ -1,6 +1,19 @@
 # Lista contendo todos os usuarios cadastrados
 usuarios = []
 
+# Dias disponíveis para a organização da grade de estudos
+dias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"]
+
+# Horários disponíveis dentro da grade de estudos
+horarios = [
+    "1ª Aula",
+    "2ª Aula",
+    "3ª Aula",
+    "4ª Aula",
+    "5ª Aula"
+]
+
+# Armazena o usuário atualmente conectado ao sistema
 usuarioLogado = None
 
 # Define a classe Usuario
@@ -10,10 +23,10 @@ class Usuario:
         self.email = email
         self.senha = senha
 
-        # Nova mudança - Cada usuario tem suas tarefas separadas
+        # Lista de tarefas pertencentes exclusivamente a este usuário
         self.tarefas = []
 
-        # Introdução da Grade de Estudos
+        # Grade individual de estudos do usuário (5 horários x 5 dias)
         self.grade = [
             ["", "", "", "", ""],
             ["", "", "", "", ""],
@@ -22,7 +35,7 @@ class Usuario:
             ["", "", "", "", ""]
         ]
 
-# Define a classe Tarefa - Anteriormente usada apenas como variavel base
+# Classe responsável por criar e gerenciar as tarefas do usuário
 class Tarefa:
 
     def __init__(self, nome, descricao, disciplina, prioridade):
@@ -51,6 +64,12 @@ class Tarefa:
         if prioridade:
             self.prioridade = prioridade
 
+# Biblioteca utilizada para comandos do sistema operacional
+import os
+
+# Limpa o terminal para melhorar a organização visual do programa
+def limparTela():
+    os.system("cls" if os.name == "nt" else "clear")
 
 # fluxo principal - onde é lido e coordenado a ação do menu
 def main():
@@ -81,6 +100,9 @@ def main():
 
 # função do menu - apenas mostra o menu e automaticamente executa o fluxo principal (main)
 def menu():
+
+    limparTela()
+
     print("----------------- |Menu| -----------------")
     print('\n')
     print("1 = Adicionar Tarefa")
@@ -92,12 +114,15 @@ def menu():
     print("7 = Grade de Estudos")
     print("0 = Sair")
     print('\n')
+    print(f'Usuario Atual: {usuarioLogado.nome}')
     print("------------------------------------------")
     
     main()
 
 # função de adicionar tarefa - toda criação da tarefa reside aqui, onde ele registra a tarefa e manda para lista principal (tarefas)
 def adicionarTarefa():
+
+    limparTela()
     
     print("----------- |Adicionar Tarefa| -----------")
     print('\n')
@@ -116,7 +141,7 @@ def adicionarTarefa():
     print('\n')
     print('Tarefa salva com sucesso!')
     print('\n')
-
+    input("\nPressione ENTER para continuar...")
     print("------------------------------------------")
 
     menu()
@@ -124,7 +149,7 @@ def adicionarTarefa():
 # função de listar tarefas - mostra e filtra cada tarefa criada por disciplina ou prioridade. mostra todas as informações delas e seu respectivo ID.
 def listarMenu():
 
-   
+    limparTela()
    
     print("------------ |Listar Tarefas| ------------")
     print('\n')
@@ -195,12 +220,16 @@ def listarMenu():
                print(f'Prioridade: {Tarefa.prioridade}')
                print(f'Status: {Tarefa.status}')
                print('\n')
-                   
+
+    input("\nPressione ENTER para continuar...")
     print("------------------------------------------")
     menu()
 
 # função de marcar como concluida - altera o status de uma tarefa (pendente/concluido)
 def statusMenu():
+
+    limparTela()
+        
     print("------------ |Marcar Status| ------------")
     print('\n')
     
@@ -234,11 +263,15 @@ def statusMenu():
 
             print("Status atualizado com sucesso.") 
     print('\n')
+    input("\nPressione ENTER para continuar...")
     print("------------------------------------------")
     menu()
 
 # função de editar tarefas - altera qualquer um dos valores da tarefa como nome, descrição e etc...
 def editarTarefa():
+
+    limparTela()
+
     print("---------------- |Editar| ----------------")
     print('\n')
 
@@ -284,12 +317,16 @@ def editarTarefa():
     print('\n')
     print("Tarefa editada com sucesso.")
     print('\n')
+    input("\nPressione ENTER para continuar...")
     print("------------------------------------------")
     
     menu()
 
 # função de excluir tarefas - apaga a tarefa selecionada no sistema. 
 def excluirTarefa():
+
+   limparTela()
+
    print("---------------- |Excluir| ----------------")
    print('\n')
    if not usuarioLogado.tarefas:
@@ -318,11 +355,15 @@ def excluirTarefa():
            else:
                 print("Exclusão cancelada.")
    print('\n')
+   input("\nPressione ENTER para continuar...")
    print("------------------------------------------")
    menu()
 
 # função exibir estatisticas - para mostrar o resumo/estatisticas das tarefas
 def estatisticas():
+
+    limparTela()
+
     print("-------------- |Estatísticas| --------------")
     print()
 
@@ -361,13 +402,140 @@ def estatisticas():
         print(f"{disciplina}: {quantidade}")
 
     print()
+    input("\nPressione ENTER para continuar...")
     print("--------------------------------------------")
     menu()
 
+# Imprime a grade contendo matérias e horários
 def gradeEstudos():
-    print("a")
 
+    limparTela()
+
+    print("---------- |Grade de Estudos| ------------")
+    print()
+    print("1 - Visualizar Grade")
+    print("2 - Adicionar / Alternar Matéria na Grade")
+    print("3 - Limpar Horário")
+    print("0 - Voltar ao Menu")
+    print()
+    print("------------------------------------------")
+
+
+    try:
+        opcao = int(input("Escolha uma opção: "))
+
+    except ValueError:
+        print("\nOpção inválida! Digite um número.")
+        input("\nPressione ENTER para continuar...")
+        return gradeEstudos()
+
+
+    if opcao == 1:
+
+        limparTela()
+
+        # Imprime a grade com as materias e horarios
+        print("-------------- Sua Grade --------------")
+        print()
+
+        print(f"{'Horário':<15} | " + 
+              " | ".join([f"{dia:^10}" for dia in dias]))
+
+        print("-" * 75)
+
+        for i, linha in enumerate(usuarioLogado.grade):
+
+            horario_str = horarios[i]
+
+            materias_str = " | ".join(
+                [f"{(materia if materia else '-'):^10}" for materia in linha]
+            )
+
+            print(f"{horario_str:<15} | {materias_str}")
+
+        print("-" * 75)
+
+        input("\nPressione ENTER para voltar...")
+        return gradeEstudos()
+
+    elif opcao == 2:
+
+        limparTela()
+
+        print("----------- Adicionar Matéria -----------")
+        print()
+
+        for i, dia in enumerate(dias):
+            print(f"{i + 1} - {dia}")
+
+        try:
+            
+            dia_idx = int(input("\nEscolha o dia (1-5): ")) - 1
+            horario_idx = int(input("Escolha o horário (1-5): ")) - 1
+
+
+            if 0 <= dia_idx < len(dias) and 0 <= horario_idx < len(horarios):
+
+                materia = input(
+                    f"\nInforme a matéria para {dias[dia_idx]} às {horarios[horario_idx]}: "
+                )
+
+                usuarioLogado.grade[horario_idx][dia_idx] = materia
+
+                print("\nMatéria adicionada com sucesso!")
+
+            else:
+                print("\nDia ou horário inválido!")
+
+        except ValueError:
+            print("\nDigite apenas números!")
+
+
+        input("\nPressione ENTER para continuar...")
+        return gradeEstudos()
+
+    elif opcao == 3:
+
+        limparTela()
+
+        print("------------ Limpar Horário ------------")
+        print()
+
+        try:
+
+            dia_idx = int(input("Escolha o dia (1-5): ")) - 1
+            horario_idx = int(input("Escolha o horário (1-5): ")) - 1
+
+            if 0 <= dia_idx < len(dias) and 0 <= horario_idx < len(horarios):
+
+                usuarioLogado.grade[horario_idx][dia_idx] = ""
+
+                print("\nHorário limpo com sucesso!")
+
+            else:
+                print("\nDia ou horário inválido!")
+
+        except ValueError:
+            print("\nDigite apenas números!")
+
+        input("\nPressione ENTER para continuar...")
+        return gradeEstudos()
+
+    elif opcao == 0:
+
+        return menu()
+
+    else:
+
+        print("\nOpção inválida!")
+        input("\nPressione ENTER para continuar...")
+        return gradeEstudos()
+
+# função de cadastrar usuario - realiza o cadastro do usuario no programa
 def cadastroUsuario():
+
+    limparTela()
+
     print("---------------- |Cadastro| ----------------")
     print('\n')
 
@@ -386,11 +554,15 @@ def cadastroUsuario():
     usuarios.append(novoUsuario)
     print("\nCadastro Realizado!")
     print('\n')
+    input("\nPressione ENTER para continuar...")
     print("--------------------------------------------")
 
     telaInicial()
 
+# Verifica as credenciais e conecta o usuário ao sistema
 def login():
+
+    limparTela()
 
     global usuarioLogado
 
@@ -411,7 +583,10 @@ def login():
 
     return False
 
+# Função inicial - ao iniciar o programa, exibe a função para entrar e salvar as informações no programa
 def telaInicial():
+
+    limparTela()
 
     print("---------------- |Inicio| ----------------")
     print('\n')

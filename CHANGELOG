@@ -3,6 +3,11 @@ Changelog (Registro de Mudanças)
 AVISO!: Este arquivo apenas serve para documentar mudanças do programa, para versões finais completas da primeira//segunda etapa
 deve ser documentada via release.
 
+v0.2 (Stable) - 23/07//2026 <- Realese 1
+    - Primeira versão completa da segunda etapa
+    - Adicionada a função de Grade de Estudos 
+    - Nova função limparTela() para polir esteticamente o programa
+
 v0.1.8 (Stable) - 23/07/2026
     - Introdução do sistema de login: ao iniciar o programa, é mostrada uma tela para logar, cadastrar ou sair.
     - Cada usuario possui seus dados de forma separada (tarefas, grade etc)
