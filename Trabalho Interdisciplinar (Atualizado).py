@@ -1,5 +1,40 @@
 # lista principal - onde é armazenado cada tarefa
 tarefas = []
+usuarios = []
+
+class Usuario:
+    def __init__(self, nome, email):
+        self.nome = nome
+        self.email = email
+
+class Tarefa:
+
+    def __init__(self, nome, descricao, disciplina, prioridade):
+
+        self.nome = nome
+        self.descricao = descricao
+        self.disciplina = disciplina
+        self.prioridade = prioridade
+        self.status = "Pendente"
+
+    def concluir(self):
+        self.status = "Concluída"
+
+    def editar(self, nome=None, descricao=None,
+               disciplina=None, prioridade=None):
+
+        if nome:
+            self.nome = nome
+
+        if descricao:
+            self.descricao = descricao
+
+        if disciplina:
+            self.disciplina = disciplina
+
+        if prioridade:
+            self.prioridade = prioridade
+
 
 # fluxo principal - onde é lido e coordenado a ação do menu
 def main():
@@ -8,7 +43,7 @@ def main():
         if entrada == 1:
             adicionarTarefa()
         elif entrada == 2 :
-            listarMenu()
+            listarMenu(tarefas)
         elif entrada == 3 :
             statusMenu()
         elif entrada == 4 :
@@ -41,19 +76,21 @@ def menu():
 
 # função de adicionar tarefa - toda criação da tarefa reside aqui, onde ele registra a tarefa e manda para lista principal (tarefas)
 def adicionarTarefa():
-    tarefa = []
     
     print("----------- |Adicionar Tarefa| -----------")
     print('\n')
 
-    tarefa = {
-        "nome": input('Nome da Tarefa: '),
-        "descricao": input('Descrição: '),
-        "disciplina": input('Disciplina: '),
-        "prioridade": input("Prioridade (Baixa, Media e Alta): "),
-        "status": "Pendente"
-        }
-    tarefas.append(tarefa)
+    novaTarefa = Tarefa(
+
+        input("Nome da tarefa: "),
+        input("Descrição: "),
+        input("Disciplina: "),
+        input("Prioridade: ")
+
+    )
+
+    tarefas.append(novaTarefa)
+    
     print('\n')
     print('Tarefa salva com sucesso!')
     print('\n')
@@ -63,7 +100,7 @@ def adicionarTarefa():
     menu()
 
 # função de listar tarefas - mostra e filtra cada tarefa criada por disciplina ou prioridade. mostra todas as informações delas e seu respectivo ID.
-def listarMenu() :
+def listarMenu(tarefas) :
 
    
    
@@ -84,13 +121,14 @@ def listarMenu() :
         print("Nenhuma tarefa cadastrada.")
         return menu()
        else :
-        for i, tarefa in enumerate(tarefas):
+        for i, Tarefa in enumerate(tarefas):
          print(f'\nID: {i}')
-         print(f'Nome: {tarefa['nome']}')
-         print(f'Descrição: {tarefa['descricao']}')
-         print(f'Disciplina: {tarefa['disciplina']}')
-         print(f'Prioridade: {tarefa['prioridade']}')
-         print(f'Status: {tarefa['status']}')
+         print(f'Nome: {Tarefa.nome}')
+         print(f'Descrição: {Tarefa.descricao}')
+         print(f'Disciplina: {Tarefa.disciplina}')
+         print(f'Prioridade: {Tarefa.prioridade}')
+         print(f'Status: {Tarefa.status}')
+         print('\n')
 
     # filtra por disciplina 
     if filtro == 2 :
@@ -100,18 +138,19 @@ def listarMenu() :
        else :
           disc = input("Informe a Disciplina: ")
 
-          filtradas = [(i, t) for i, t in enumerate(tarefas) if t['disciplina'].lower() == disc.lower()]
+          filtradas = [(i, t) for i, t in enumerate(tarefas) if t.disciplina.lower() == disc.lower()]
 
           if not filtradas:
             print("Nenhuma tarefa encontrada.")
           else:
-            for i, tarefa in filtradas:
+            for i, Tarefa in filtradas:
                print(f'\nID: {i}')
-               print(f'Nome: {tarefa["nome"]}')
-               print(f'Descrição: {tarefa["descricao"]}')
-               print(f'Disciplina: {tarefa["disciplina"]}')
-               print(f'Prioridade: {tarefa["prioridade"]}')
-               print(f'Status: {tarefa["status"]}')
+               print(f'Nome: {Tarefa.nome}')
+               print(f'Descrição: {Tarefa.descricao}')
+               print(f'Disciplina: {Tarefa.disciplina}')
+               print(f'Prioridade: {Tarefa.prioridade}')
+               print(f'Status: {Tarefa.status}')
+               print('\n')
     
     # filtra por prioridade
     if filtro == 3 :
@@ -121,18 +160,19 @@ def listarMenu() :
        else :
           prior = input("Informe a Prioridade: ")
 
-          filtradas = [(i, t) for i, t in enumerate(tarefas) if t['prioridade'].lower() == prior.lower()]
+          filtradas = [(i, t) for i, t in enumerate(tarefas) if t.prioridade.lower() == prior.lower()]
 
           if not filtradas:
             print("Nenhuma tarefa encontrada.")
           else:
-            for i, tarefa in filtradas:
+            for i, Tarefa in filtradas:
                print(f'\nID: {i}')
-               print(f'Nome: {tarefa["nome"]}')
-               print(f'Descrição: {tarefa["descricao"]}')
-               print(f'Disciplina: {tarefa["disciplina"]}')
-               print(f'Prioridade: {tarefa["prioridade"]}')
-               print(f'Status: {tarefa["status"]}')
+               print(f'Nome: {Tarefa.nome}')
+               print(f'Descrição: {Tarefa.descricao}')
+               print(f'Disciplina: {Tarefa.disciplina}')
+               print(f'Prioridade: {Tarefa.prioridade}')
+               print(f'Status: {Tarefa.status}')
+               print('\n')
                    
     print("------------------------------------------")
     menu()
@@ -146,10 +186,10 @@ def statusMenu() :
        print("Nnehuma tarefa encontrada.")
        return menu()
     else:
-       for i, tarefa in enumerate(tarefas):
+       for i, Tarefa in enumerate(tarefas):
          print(f'\nID: {i}')
-         print(f'Nome: {tarefa['nome']}')
-         print(f'Status: {tarefa['status']}')
+         print(f'Nome: {Tarefa.nome}')
+         print(f'Status: {Tarefa.status}')
 
        print('\n')
        indice = int(input('Informe o ID da tarefa: '))
@@ -163,9 +203,9 @@ def statusMenu() :
             opcao = int(input("Escolha uma opção: "))
 
             if opcao == 1 :
-                  tarefas[indice]['status'] = "Concluída"
+                  tarefas[indice].status = "Concluída"
             elif opcao == 2 :
-                  tarefas[indice]['status'] = "Pendente"
+                  tarefas[indice].status = "Pendente"
             else :
                   print("Opção Inválida!")
                   return
@@ -184,13 +224,14 @@ def editarTarefa() :
         print("Nenhuma tarefa cadastrada.")
         return menu()
     else :
-        for i, tarefa in enumerate(tarefas):
-         print(f'\nID: {i}')
-         print(f'Nome: {tarefa['nome']}')
-         print(f'Descrição: {tarefa['descricao']}')
-         print(f'Disciplina: {tarefa['disciplina']}')
-         print(f'Prioridade: {tarefa['prioridade']}')
-         print(f'Status: {tarefa['status']}')
+        for i, Tarefa in enumerate(tarefas):
+            print(f'\nID: {i}')
+            print(f'Nome: {Tarefa.nome}')
+            print(f'Descrição: {Tarefa.descricao}')
+            print(f'Disciplina: {Tarefa.disciplina}')
+            print(f'Prioridade: {Tarefa.prioridade}')
+            print(f'Status: {Tarefa.status}')
+            print('\n')
 
         print('\n')
         indice = int(input("Informe o ID da Tarefa: "))
@@ -208,16 +249,16 @@ def editarTarefa() :
             opcao = int(input("Escolha uma opção: "))
             if opcao == 1 :
                novoNome = input("Informe o novo nome: ")
-               tarefas[indice]['nome'] = novoNome
+               tarefas[indice].nome = novoNome
             elif opcao == 2 :
                novaDesc = input("Informe a nova descrição: ")
-               tarefas[indice]['descricao'] = novaDesc
+               tarefas[indice].descricao = novaDesc
             elif opcao == 3 :
                novaDisc = input("Informe a nova disciplina: ")
-               tarefas[indice]['disciplina'] = novaDisc
+               tarefas[indice].disciplina = novaDisc
             elif opcao == 4 :
                novaPrior = input("Informe a nova prioridade (Baixa, Media e Alta): ")
-               tarefas[indice]['prioridade'] = novaPrior
+               tarefas[indice].prioridade = novaPrior
     print('\n')
     print("Tarefa editada com sucesso.")
     print('\n')
@@ -233,14 +274,14 @@ def excluirTarefa() :
         print("Nenhuma tarefa cadastrada.")
         return menu()
    else :
-        for i, tarefa in enumerate(tarefas):
-         print(f'\nID: {i}')
-         print(f'Nome: {tarefa['nome']}')
-         print(f'Descrição: {tarefa['descricao']}')
-         print(f'Disciplina: {tarefa['disciplina']}')
-         print(f'Prioridade: {tarefa['prioridade']}')
-         print(f'Status: {tarefa['status']}')
-         print('\n')
+        for i, Tarefa in enumerate(tarefas):
+            print(f'\nID: {i}')
+            print(f'Nome: {Tarefa.nome}')
+            print(f'Descrição: {Tarefa.descricao}')
+            print(f'Disciplina: {Tarefa.disciplina}')
+            print(f'Prioridade: {Tarefa.prioridade}')
+            print(f'Status: {Tarefa.status}')
+            print('\n')
 
         indice = int(input("Informe o ID da Tarefa: "))
         if indice < 0 or indice >= len(tarefas):
@@ -272,16 +313,16 @@ def estatisticas():
     disciplinas = {}
 
     # Percorre todas as tarefas
-    for tarefa in tarefas:
+    for Tarefa in tarefas:
 
         # Conta o status
-        if tarefa["status"] == "Concluída":
+        if Tarefa.status == "Concluída":
             concluidas += 1
         else:
             pendentes += 1
 
         # Conta as disciplinas
-        disciplina = tarefa["disciplina"]
+        disciplina = Tarefa.disciplina
 
         if disciplina in disciplinas:
             disciplinas[disciplina] += 1
@@ -301,6 +342,12 @@ def estatisticas():
     print("--------------------------------------------")
     menu()
 
+usuarios.append(
+    Usuario(
+        "Aluno",
+        "alunoIsepam@gmail.com"
+    )
+)
 
 # inicio real do codigo - onde a função inicial é chamada e da inicio ao programa.
 menu()
