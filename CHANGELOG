@@ -1,0 +1,7 @@
+# Changelog (Registro de Mudanças)
+
+# AVISO!: Este arquivo apenas serve para documentar mudanças do programa, para versões finais completas da primeira//segunda etapa
+# deve ser documentada via release.
+
+## v0.1.2 - 21/07/2026 
+- Adicionada nova função de estatisticas onde exibe: numero total de tarefas concluidas/pendentes, quantidade de tarefas de cada materia e etc.
