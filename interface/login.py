@@ -92,6 +92,11 @@ def telaLogin(janela):
     )
     mensagem.pack()
 
+    # Função de abrir tela de cadastro
+    def abrirCadastro():
+        from interface.cadastro import telaCadastro
+        telaCadastro(janela)
+
     # Função do botão
     def verificarLogin():
 
@@ -105,10 +110,8 @@ def telaLogin(janela):
         estudante = login(email, senha)
 
         if estudante is not None:
-            mensagem.config(
-                text="Login realizado com sucesso!",
-                fg="#3b9875"
-            )
+            from interface.inicio import telaInicio
+            telaInicio(janela, estudante)
         else:
             mensagem.config(text="E-mail ou senha incorretos.")
 
@@ -126,3 +129,15 @@ def telaLogin(janela):
         command=verificarLogin
     )
     botaoLogin.pack(pady=15)
+
+    botaoCadastro = tk.Button(
+        quadro,
+        text="Criar uma conta",
+        font=("Arial", 10),
+        bg=BRANCO,
+        fg=AZUL_PRINCIPAL,
+        relief="flat",
+        cursor="hand2",
+        command=abrirCadastro
+    )
+    botaoCadastro.pack()
