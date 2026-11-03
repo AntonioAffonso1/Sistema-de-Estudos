@@ -51,6 +51,18 @@ def telaInicio(janela, estudante):
         from interface.estatisticas import telaEstatisticas
         telaEstatisticas(janela, estudante)
 
+    def abrirDisciplinas():
+        from interface.disciplinas import telaDisciplinas
+        telaDisciplinas(janela, estudante)
+
+    def abrirResumos():
+        from interface.resumos import telaResumos
+        telaResumos(janela, estudante)
+
+    def abrirFlashcards():
+        from interface.flashcards import telaFlashcards
+        telaFlashcards(janela, estudante)
+
     botaoSair = tk.Button(
         cabecalho,
         text="Sair",
@@ -137,4 +149,53 @@ def telaInicio(janela, estudante):
     )
     botaoEstatisticas.grid(row=1, column=0, padx=10, pady=10)
 
+        # Botão de disciplinas
+    botaoDisciplinas = tk.Button(
+        menus,
+        text="Minhas disciplinas",
+        font=("Arial", 13, "bold"),
+        bg=BRANCO,
+        fg=AZUL_PRINCIPAL,
+        width=25,
+        height=4,
+        relief="flat",
+        cursor="hand2",
+        command=abrirDisciplinas
+    )
+    botaoDisciplinas.grid(row=1, column=1, padx=10, pady=10)
+
+        # Botão de resumos
+    botaoResumos = tk.Button(
+        menus,
+        text="Meus resumos",
+        font=("Arial", 13, "bold"),
+        bg=BRANCO,
+        fg=AZUL_PRINCIPAL,
+        width=25,
+        height=4,
+        relief="flat",
+        cursor="hand2",
+        command=abrirResumos
+    )
+    botaoResumos.grid(row=2, column=0, padx=10, pady=10)
+
+    botaoFlashcards = tk.Button(
+        menus,
+        text="Meus Flashcards",
+        font=("Arial", 13, "bold"),
+        bg=BRANCO,
+        fg=AZUL_PRINCIPAL,
+        width=25,
+        height=4,
+        relief="flat",
+        cursor="hand2",
+        command=abrirFlashcards
+    )
+
+    botaoFlashcards.grid(
+        row=2,
+        column=1,
+        padx=10,
+        pady=10
+    )
 

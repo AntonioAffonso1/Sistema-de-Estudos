@@ -103,3 +103,46 @@ print("Resumos de Maria:", len(estudante2.resumos))
 
 print("Flashcards de João:", len(estudante1.flashcards))
 print("Flashcards de Maria:", len(estudante2.flashcards))
+
+from classes.disciplina import Disciplina
+
+disciplina1 = Disciplina(
+    1,
+    "Matemática",
+    "Estudo de números, equações e funções."
+)
+
+print(disciplina1.nome)
+print(disciplina1.descricao)
+
+disciplina1.editar(
+    nome="Matemática Básica",
+    descricao="Estudo dos fundamentos matemáticos."
+)
+
+print(disciplina1.nome)
+print(disciplina1.descricao)
+
+from classes.estudante import Estudante
+from classes.disciplina import Disciplina
+
+estudante1 = Estudante("João", "joao@email.com", "123")
+estudante2 = Estudante("Maria", "maria@email.com", "456")
+
+disciplina1 = Disciplina(
+    1,
+    "Matemática",
+    "Estudo de números e equações."
+)
+
+estudante1.disciplinas.append(disciplina1)
+
+print("Disciplinas de João:")
+
+for disciplina in estudante1.disciplinas:
+    print(disciplina.nome)
+
+print("Disciplinas de Maria:")
+
+for disciplina in estudante2.disciplinas:
+    print(disciplina.nome)

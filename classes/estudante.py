@@ -13,5 +13,6 @@ class Estudante:
         self.tarefas = []
         self.resumos = []
         self.flashcards = []
+        self.disciplinas = []
 
         self.grade = GradeEstudo()

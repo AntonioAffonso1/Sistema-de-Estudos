@@ -84,8 +84,16 @@ def telaTarefas(janela, estudante):
     tk.Label(formulario, text="Prioridade:", bg=BRANCO, fg=TEXTO).grid(
         row=4, column=0, sticky="w", pady=5
     )
+
     campoPrioridade = tk.Entry(formulario, width=35, font=("Arial", 11))
     campoPrioridade.grid(row=4, column=1, sticky="w", pady=5)
+
+    tk.Label(formulario, text="Prazo (DD/MM/AAAA):", bg=BRANCO, fg=TEXTO).grid(
+        row=5, column=0, sticky="w", pady=5
+    )
+
+    campoPrazo = tk.Entry(formulario, width=35, font=("Arial", 11))
+    campoPrazo.grid(row=5, column=1, sticky="w", pady=5)
 
     mensagem = tk.Label(
         formulario,
@@ -94,7 +102,7 @@ def telaTarefas(janela, estudante):
         bg=BRANCO,
         fg="#cf5c66"
     )
-    mensagem.grid(row=5, column=0, columnspan=2, pady=5)
+    mensagem.grid(row=6, column=0, columnspan=2, pady=5)
 
     # Lista de tarefas
     areaLista = tk.Frame(conteudo, bg=BRANCO, padx=20, pady=15)
@@ -123,7 +131,7 @@ def telaTarefas(janela, estudante):
         for tarefa in estudante.tarefas:
             texto = (
                 f"{tarefa.nome} | {tarefa.disciplina} | "
-                f"{tarefa.prioridade} | {tarefa.status}"
+                f"{tarefa.prioridade} | {tarefa.prazo} | {tarefa.status}"
             )
             listaTarefas.insert(tk.END, texto)
 
@@ -132,6 +140,7 @@ def telaTarefas(janela, estudante):
         campoDescricao.delete(0, tk.END)
         campoDisciplina.delete(0, tk.END)
         campoPrioridade.delete(0, tk.END)
+        campoPrazo.delete(0, tk.END)
 
     def adicionarTarefa():
         try:
@@ -141,12 +150,19 @@ def telaTarefas(janela, estudante):
             descricao = campoDescricao.get()
             disciplina = campoDisciplina.get()
             prioridade = campoPrioridade.get()
+            prazo = campoPrazo.get()
 
-            if not nome or not descricao or not disciplina or not prioridade:
+            if not nome or not descricao or not disciplina or not prioridade or not prazo:
                 mensagem.config(text="Preencha todos os campos.")
                 return
 
-            novaTarefa = Tarefa(nome, descricao, disciplina, prioridade)
+            novaTarefa = Tarefa(
+                nome,
+                descricao,
+                disciplina,
+                prioridade,
+                prazo
+            )
 
             estudante.tarefas.append(novaTarefa)
 
@@ -161,25 +177,6 @@ def telaTarefas(janela, estudante):
         except Exception as erro:
             print("Erro ao adicionar tarefa:", erro)
             mensagem.config(text="Não foi possível adicionar a tarefa.")
-            from classes.tarefa import Tarefa
-
-            nome = campoNome.get()
-            descricao = campoDescricao.get()
-            disciplina = campoDisciplina.get()
-            prioridade = campoPrioridade.get()
-
-            if not nome or not descricao or not disciplina or not prioridade:
-                mensagem.config(text="Preencha todos os campos.")
-                return
-
-            novaTarefa = Tarefa(nome, descricao, disciplina, prioridade)
-
-            estudante.tarefas.append(novaTarefa)
-
-            atualizarLista()
-            limparCampos()
-
-            mensagem.config(text="Tarefa adicionada com sucesso!", fg="#3b9875")
 
     def selecionarTarefa(evento):
         selecao = listaTarefas.curselection()
@@ -194,6 +191,7 @@ def telaTarefas(janela, estudante):
             campoDescricao.insert(0, tarefa.descricao)
             campoDisciplina.insert(0, tarefa.disciplina)
             campoPrioridade.insert(0, tarefa.prioridade)
+            campoPrazo.insert(0, tarefa.prazo)
 
             mensagem.config(text="Tarefa selecionada para edição.")
 
@@ -211,15 +209,22 @@ def telaTarefas(janela, estudante):
             descricao = campoDescricao.get()
             disciplina = campoDisciplina.get()
             prioridade = campoPrioridade.get()
+            prazo = campoPrazo.get()
 
-            if not nome or not descricao or not disciplina or not prioridade:
+            if not nome or not descricao or not disciplina or not prioridade or not prazo:
                 mensagem.config(text="Preencha todos os campos.")
                 return
 
             indice = selecao[0]
             tarefa = estudante.tarefas[indice]
 
-            tarefa.editar(nome, descricao, disciplina, prioridade)
+            tarefa.editar(
+                nome,
+                descricao,
+                disciplina,
+                prioridade,
+                prazo
+            )
 
             atualizarLista()
             limparCampos()
@@ -237,25 +242,6 @@ def telaTarefas(janela, estudante):
             if not selecao:
                 mensagem.config(text="Selecione uma tarefa para editar.")
                 return
-
-            nome = campoNome.get()
-            descricao = campoDescricao.get()
-            disciplina = campoDisciplina.get()
-            prioridade = campoPrioridade.get()
-
-            if not nome or not descricao or not disciplina or not prioridade:
-                mensagem.config(text="Preencha todos os campos.")
-                return
-
-            indice = selecao[0]
-            tarefa = estudante.tarefas[indice]
-
-            tarefa.editar(nome, descricao, disciplina, prioridade)
-
-            atualizarLista()
-            limparCampos()
-
-            mensagem.config(text="Tarefa editada com sucesso!", fg="#3b9875")
 
     def concluirTarefa():
         try:
