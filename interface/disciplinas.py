@@ -1,7 +1,14 @@
 
 import tkinter as tk
 
-from classes.disciplina import Disciplina
+from servicos.disciplinas import (
+    listarDisciplinas,
+    adicionarDisciplina as salvarDisciplina,
+    editarDisciplina as atualizarDisciplina,
+    excluirDisciplina as removerDisciplina
+)
+
+from tkinter import messagebox
 
 AZUL_PRINCIPAL = "#182c73"
 AZUL_SECUNDARIO = "#15255e"
@@ -135,7 +142,13 @@ def telaDisciplinas(janela, estudante):
     mensagem.pack(pady=5)
 
     # Atualiza a lista
+    
+    # Atualiza a lista consultando o Oracle
     def atualizarLista():
+
+        estudante.disciplinas = listarDisciplinas(
+            estudante.id_estudante
+        )
 
         listaDisciplinas.delete(0, tk.END)
 
@@ -151,37 +164,12 @@ def telaDisciplinas(janela, estudante):
         campoNome.delete(0, tk.END)
         campoDescricao.delete(0, tk.END)
 
-    # Seleciona uma disciplina
-    def selecionarDisciplina(evento):
-
-        try:
-            selecao = listaDisciplinas.curselection()
-
-            if not selecao:
-                return
-
-            indice = selecao[0]
-            disciplina = estudante.disciplinas[indice]
-
-            limparCampos()
-
-            campoNome.insert(0, disciplina.nome)
-            campoDescricao.insert(0, disciplina.descricao)
-
-        except Exception as erro:
-            print("Erro ao selecionar disciplina:", erro)
-
-    listaDisciplinas.bind(
-        "<<ListboxSelect>>",
-        selecionarDisciplina
-    )
-
     # Adiciona uma disciplina
     def adicionarDisciplina():
 
         try:
-            nome = campoNome.get()
-            descricao = campoDescricao.get()
+            nome = campoNome.get().strip()
+            descricao = campoDescricao.get().strip()
 
             if not nome or not descricao:
                 mensagem.config(
@@ -190,28 +178,25 @@ def telaDisciplinas(janela, estudante):
                 )
                 return
 
-            # Gera um novo identificador
-            novoId = 1
-
-            for disciplina in estudante.disciplinas:
-                if disciplina.id >= novoId:
-                    novoId = disciplina.id + 1
-
-            novaDisciplina = Disciplina(
-                novoId,
+            resultado = salvarDisciplina(
                 nome,
-                descricao
+                descricao,
+                estudante.id_estudante
             )
 
-            estudante.disciplinas.append(novaDisciplina)
+            if resultado:
+                atualizarLista()
+                limparCampos()
 
-            atualizarLista()
-            limparCampos()
-
-            mensagem.config(
-                text="Disciplina cadastrada com sucesso!",
-                fg="#3b9875"
-            )
+                mensagem.config(
+                    text="Disciplina cadastrada com sucesso!",
+                    fg="#3b9875"
+                )
+            else:
+                mensagem.config(
+                    text="Não foi possível cadastrar a disciplina.",
+                    fg="#cf5c66"
+                )
 
         except Exception as erro:
             print("Erro ao cadastrar disciplina:", erro)
@@ -233,8 +218,8 @@ def telaDisciplinas(janela, estudante):
                 )
                 return
 
-            nome = campoNome.get()
-            descricao = campoDescricao.get()
+            nome = campoNome.get().strip()
+            descricao = campoDescricao.get().strip()
 
             if not nome or not descricao:
                 mensagem.config(
@@ -246,15 +231,26 @@ def telaDisciplinas(janela, estudante):
             indice = selecao[0]
             disciplina = estudante.disciplinas[indice]
 
-            disciplina.editar(nome, descricao)
-
-            atualizarLista()
-            limparCampos()
-
-            mensagem.config(
-                text="Disciplina editada com sucesso!",
-                fg="#3b9875"
+            resultado = atualizarDisciplina(
+                disciplina.id,
+                nome,
+                descricao,
+                estudante.id_estudante
             )
+
+            if resultado:
+                atualizarLista()
+                limparCampos()
+
+                mensagem.config(
+                    text="Disciplina editada com sucesso!",
+                    fg="#3b9875"
+                )
+            else:
+                mensagem.config(
+                    text="Não foi possível editar a disciplina.",
+                    fg="#cf5c66"
+                )
 
         except Exception as erro:
             print("Erro ao editar disciplina:", erro)
@@ -277,23 +273,35 @@ def telaDisciplinas(janela, estudante):
                 return
 
             indice = selecao[0]
+            disciplina = estudante.disciplinas[indice]
 
-            estudante.disciplinas.pop(indice)
-
-            atualizarLista()
-            limparCampos()
-
-            mensagem.config(
-                text="Disciplina excluída com sucesso!",
-                fg="#3b9875"
+            resultado = removerDisciplina(
+                disciplina.id,
+                estudante.id_estudante
             )
+
+            if resultado:
+                atualizarLista()
+                limparCampos()
+
+                mensagem.config(
+                    text="Disciplina excluída com sucesso!",
+                    fg="#3b9875"
+                )
+            else:
+                mensagem.config(
+                    text="Não foi possível excluir. Verifique se existem registros vinculados.",
+                    fg="#cf5c66"
+                )
 
         except Exception as erro:
             print("Erro ao excluir disciplina:", erro)
+
             mensagem.config(
-                text="Não foi possível excluir a disciplina.",
+                text="Não foi possível excluir a disciplina. Ela pode possuir registros vinculados.",
                 fg="#cf5c66"
             )
+
 
     # Botões
     botoes = tk.Frame(conteudo, bg=FUNDO)

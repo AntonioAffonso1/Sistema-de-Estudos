@@ -44,7 +44,7 @@ def login(email, senha):
 
     try:
         cursor.execute("""
-            SELECT nome, email, senha
+            SELECT id_estudante, nome, email, senha
             FROM estudante
             WHERE email = :email AND senha = :senha
         """, {
@@ -56,9 +56,10 @@ def login(email, senha):
 
         if resultado:
             estudante = Estudante(
-                resultado[0],
                 resultado[1],
-                resultado[2]
+                resultado[2],
+                resultado[3],
+                resultado[0]
             )
 
             return estudante

@@ -1,6 +1,14 @@
 
 import tkinter as tk
 
+from servicos.tarefas import (
+    listarTarefas,
+    adicionarTarefa as salvarTarefa,
+    editarTarefa,
+    concluirTarefa,
+    excluirTarefa
+)
+
 AZUL_PRINCIPAL = "#182c73"
 AZUL_SECUNDARIO = "#15255e"
 AZUL_BOTOES = "#3d4c82"
@@ -16,6 +24,15 @@ def telaTarefas(janela, estudante):
         componente.destroy()
 
     janela.configure(bg=FUNDO)
+
+    from servicos.disciplinas import listarDisciplinas
+
+    estudante.disciplinas = listarDisciplinas(estudante.id_estudante)
+
+    print("Disciplinas carregadas:")
+
+    for disciplina in estudante.disciplinas:
+        print(disciplina.id, disciplina.nome)
 
     # Cabeçalho
     cabecalho = tk.Frame(janela, bg=AZUL_PRINCIPAL, height=75)
@@ -128,11 +145,14 @@ def telaTarefas(janela, estudante):
     def atualizarLista():
         listaTarefas.delete(0, tk.END)
 
+        estudante.tarefas = listarTarefas(estudante.id_estudante)
+
         for tarefa in estudante.tarefas:
             texto = (
                 f"{tarefa.nome} | {tarefa.disciplina} | "
                 f"{tarefa.prioridade} | {tarefa.prazo} | {tarefa.status}"
             )
+
             listaTarefas.insert(tk.END, texto)
 
     def limparCampos():
@@ -142,10 +162,9 @@ def telaTarefas(janela, estudante):
         campoPrioridade.delete(0, tk.END)
         campoPrazo.delete(0, tk.END)
 
+    
     def adicionarTarefa():
         try:
-            from classes.tarefa import Tarefa
-
             nome = campoNome.get()
             descricao = campoDescricao.get()
             disciplina = campoDisciplina.get()
@@ -156,27 +175,46 @@ def telaTarefas(janela, estudante):
                 mensagem.config(text="Preencha todos os campos.")
                 return
 
-            novaTarefa = Tarefa(
+            # Procura a disciplina cadastrada pelo estudante
+            disciplinaEncontrada = None
+
+            for item in estudante.disciplinas:
+                if item.nome.lower() == disciplina.lower():
+                    disciplinaEncontrada = item
+                    break
+
+            if disciplinaEncontrada is None:
+                mensagem.config(
+                    text="Disciplina não encontrada. Verifique o nome."
+                )
+                return
+
+            sucesso = salvarTarefa(
                 nome,
                 descricao,
-                disciplina,
+                disciplinaEncontrada.id,
                 prioridade,
-                prazo
+                prazo,
+                estudante.id_estudante
             )
 
-            estudante.tarefas.append(novaTarefa)
+            if sucesso:
+                atualizarLista()
+                limparCampos()
 
-            atualizarLista()
-            limparCampos()
-
-            mensagem.config(
-                text="Tarefa adicionada com sucesso!",
-                fg="#3b9875"
-            )
+                mensagem.config(
+                    text="Tarefa adicionada com sucesso!",
+                    fg="#3b9875"
+                )
+            else:
+                mensagem.config(
+                    text="Não foi possível adicionar a tarefa."
+                )
 
         except Exception as erro:
             print("Erro ao adicionar tarefa:", erro)
-            mensagem.config(text="Não foi possível adicionar a tarefa.")
+            mensagem.config(text="Ocorreu um erro ao adicionar a tarefa.")
+
 
     def selecionarTarefa(evento):
         selecao = listaTarefas.curselection()
