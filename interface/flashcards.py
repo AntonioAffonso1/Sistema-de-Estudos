@@ -3,12 +3,21 @@ import tkinter as tk
 
 from classes.flashcard import Flashcard
 
+from servicos.flashcards import (
+    listarFlashcards,
+    adicionarFlashcard as salvarFlashcardBanco,
+    editarFlashcard as atualizarFlashcardBanco,
+    excluirFlashcard as removerFlashcardBanco
+)
+
 AZUL_PRINCIPAL = "#182c73"
 AZUL_SECUNDARIO = "#15255e"
 AZUL_BOTOES = "#3d4c82"
 FUNDO = "#f4f6fb"
 BRANCO = "#ffffff"
 TEXTO = "#202a44"
+SUCESSO = "#3b9875"
+ERRO = "#cf5c66"
 
 
 def telaFlashcards(janela, estudante):
@@ -18,6 +27,12 @@ def telaFlashcards(janela, estudante):
         componente.destroy()
 
     janela.configure(bg=FUNDO)
+    from servicos.disciplinas import listarDisciplinas
+    from servicos.resumos import listarResumos
+
+    estudante.disciplinas = listarDisciplinas(estudante.id_estudante)
+    estudante.resumos = listarResumos(estudante.id_estudante)
+    estudante.flashcards = listarFlashcards(estudante.id_estudante)
 
     # Cabeçalho
     cabecalho = tk.Frame(
@@ -316,29 +331,28 @@ def telaFlashcards(janela, estudante):
                     )
                     return
 
-            novoId = 1
-
-            for flashcard in estudante.flashcards:
-                if flashcard.id_flashcard >= novoId:
-                    novoId = flashcard.id_flashcard + 1
-
-            novoFlashcard = Flashcard(
-                novoId,
+            sucesso = salvarFlashcardBanco(
                 pergunta,
                 resposta,
                 disciplinaEncontrada.id,
-                idResumo
+                idResumo,
+                estudante.id_estudante
             )
 
-            estudante.flashcards.append(novoFlashcard)
+            if sucesso:
+                estudante.flashcards = listarFlashcards(estudante.id_estudante)
+                atualizarLista()
+                limparCampos()
 
-            atualizarLista()
-            limparCampos()
-
-            mensagem.config(
-                text="Flashcard cadastrado com sucesso!",
-                fg="#3b9875"
-            )
+                mensagem.config(
+                    text="Flashcard cadastrado com sucesso!",
+                    fg=SUCESSO
+                )   
+            else:
+                mensagem.config(
+                    text="Não foi possível cadastrar o flashcard.",
+                    fg=ERRO
+                )
 
         except Exception as erro:
             print("Erro ao cadastrar flashcard:", erro)
@@ -403,21 +417,30 @@ def telaFlashcards(janela, estudante):
             indice = selecao[0]
             flashcard = estudante.flashcards[indice]
 
-            flashcard.editar(
+            sucesso = atualizarFlashcardBanco(
+                flashcard.id_flashcard,
                 pergunta,
                 resposta,
                 disciplinaEncontrada.id,
-                idResumo
+                idResumo,
+                estudante.id_estudante
             )
 
-            atualizarLista()
-            limparCampos()
+            if sucesso:
+                estudante.flashcards = listarFlashcards(estudante.id_estudante)
+                atualizarLista()
+                limparCampos()
 
-            mensagem.config(
-                text="Flashcard editado com sucesso!",
-                fg="#3b9875"
-            )
-
+                mensagem.config(
+                    text="Flashcard atualizado com sucesso!",
+                    fg=SUCESSO
+                )
+            else:
+                mensagem.config(
+                    text="Não foi possível atualizar o flashcard.",
+                    fg=ERRO
+                    )
+                
         except Exception as erro:
             print("Erro ao editar flashcard:", erro)
             mensagem.config(
@@ -439,15 +462,27 @@ def telaFlashcards(janela, estudante):
                 return
 
             indice = selecao[0]
-            estudante.flashcards.pop(indice)
+            flashcard = estudante.flashcards[indice]
 
-            atualizarLista()
-            limparCampos()
-
-            mensagem.config(
-                text="Flashcard excluído com sucesso!",
-                fg="#3b9875"
+            sucesso = removerFlashcardBanco(
+                flashcard.id_flashcard,
+                estudante.id_estudante
             )
+
+            if sucesso:
+                estudante.flashcards = listarFlashcards(estudante.id_estudante)
+                atualizarLista()
+                limparCampos()
+
+                mensagem.config(
+                    text="Flashcard excluído com sucesso!",
+                    fg=SUCESSO
+                )
+            else:
+                mensagem.config(
+                    text="Não foi possível excluir o flashcard.",
+                    fg=ERRO
+                )
 
         except Exception as erro:
             print("Erro ao excluir flashcard:", erro)

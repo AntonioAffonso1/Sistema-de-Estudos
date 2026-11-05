@@ -3,6 +3,13 @@ import tkinter as tk
 
 from classes.resumo import Resumo
 
+from servicos.resumos import (
+    listarResumos,
+    adicionarResumo as salvarResumoBanco,
+    editarResumo as atualizarResumoBanco,
+    excluirResumo as removerResumoBanco
+)
+
 AZUL_PRINCIPAL = "#182c73"
 AZUL_SECUNDARIO = "#15255e"
 AZUL_BOTOES = "#3d4c82"
@@ -18,7 +25,11 @@ def telaResumos(janela, estudante):
         componente.destroy()
 
     janela.configure(bg=FUNDO)
+    
+    from servicos.disciplinas import listarDisciplinas
 
+    estudante.disciplinas = listarDisciplinas(estudante.id_estudante)
+    estudante.resumos = listarResumos(estudante.id_estudante)
     # Cabeçalho
     cabecalho = tk.Frame(
         janela,
@@ -220,6 +231,7 @@ def telaResumos(janela, estudante):
     )
 
     # Adiciona um resumo
+    
     def adicionarResumo():
 
         try:
@@ -255,28 +267,28 @@ def telaResumos(janela, estudante):
                 )
                 return
 
-            novoId = 1
-
-            for resumo in estudante.resumos:
-                if resumo.id_resumo >= novoId:
-                    novoId = resumo.id_resumo + 1
-
-            novoResumo = Resumo(
-                novoId,
+            sucesso = salvarResumoBanco(
                 titulo,
                 conteudoResumo,
-                disciplinaEncontrada.id
+                disciplinaEncontrada.id,
+                estudante.id_estudante
             )
 
-            estudante.resumos.append(novoResumo)
+            if sucesso:
+                estudante.resumos = listarResumos(estudante.id_estudante)
 
-            atualizarLista()
-            limparCampos()
+                atualizarLista()
+                limparCampos()
 
-            mensagem.config(
-                text="Resumo cadastrado com sucesso!",
-                fg="#3b9875"
-            )
+                mensagem.config(
+                    text="Resumo cadastrado com sucesso!",
+                    fg="#3b9875"
+                )
+            else:
+                mensagem.config(
+                    text="Não foi possível cadastrar o resumo.",
+                    fg="#cf5c66"
+                )
 
         except Exception as erro:
             print("Erro ao cadastrar resumo:", erro)
@@ -325,19 +337,29 @@ def telaResumos(janela, estudante):
             indice = selecao[0]
             resumo = estudante.resumos[indice]
 
-            resumo.editar(
+            sucesso = atualizarResumoBanco(
+                resumo.id_resumo,
                 titulo,
                 conteudoResumo,
-                disciplinaEncontrada.id
+                disciplinaEncontrada.id,
+                estudante.id_estudante
             )
 
-            atualizarLista()
-            limparCampos()
+            if sucesso:
+                estudante.resumos = listarResumos(estudante.id_estudante)
 
-            mensagem.config(
-                text="Resumo editado com sucesso!",
-                fg="#3b9875"
-            )
+                atualizarLista()
+                limparCampos()
+
+                mensagem.config(
+                    text="Resumo editado com sucesso!",
+                    fg="#3b9875"
+                )
+            else:
+                mensagem.config(
+                    text="Não foi possível editar o resumo.",
+                    fg="#cf5c66"
+                )
 
         except Exception as erro:
             print("Erro ao editar resumo:", erro)
@@ -360,15 +382,28 @@ def telaResumos(janela, estudante):
                 return
 
             indice = selecao[0]
-            estudante.resumos.pop(indice)
+            resumo = estudante.resumos[indice]
 
-            atualizarLista()
-            limparCampos()
-
-            mensagem.config(
-                text="Resumo excluído com sucesso!",
-                fg="#3b9875"
+            sucesso = removerResumoBanco(
+                resumo.id_resumo,
+                estudante.id_estudante
             )
+
+            if sucesso:
+                estudante.resumos = listarResumos(estudante.id_estudante)
+
+                atualizarLista()
+                limparCampos()
+
+                mensagem.config(
+                    text="Resumo excluído com sucesso!",
+                    fg="#3b9875"
+                )
+            else:
+                mensagem.config(
+                    text="Não foi possível excluir o resumo.",
+                    fg="#cf5c66"
+                )
 
         except Exception as erro:
             print("Erro ao excluir resumo:", erro)
