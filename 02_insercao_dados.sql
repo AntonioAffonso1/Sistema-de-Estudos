@@ -162,3 +162,7 @@ INNER JOIN grade g
 INNER JOIN horarioGrade hg
     ON g.id_grade = hg.id_grade
 ORDER BY e.id_estudante, hg.dia, hg.horario;
+
+SELECT DISTINCT dia
+FROM horarioGrade
+ORDER BY dia;

@@ -1,5 +1,6 @@
 
 import tkinter as tk
+from servicos.grade import listarGrade, salvarGrade as salvarGradeBanco
 
 AZUL_PRINCIPAL = "#182c73"
 AZUL_SECUNDARIO = "#15255e"
@@ -113,7 +114,7 @@ def telaGrade(janela, estudante):
         ).grid(row=0, column=dia + 1, padx=3, pady=8)
 
     # Criação das linhas e campos
-    gradeAtual = estudante.grade.visualizarGrade()
+    gradeAtual = listarGrade(estudante.id_estudante)
 
     for horario in range(5):
 
@@ -163,32 +164,35 @@ def telaGrade(janela, estudante):
     mensagem.pack(pady=10)
 
     # Salvar as alterações
+
     def salvarGrade():
         try:
+            horariosAtualizados = [[""] * 5 for _ in range(5)]
+
             for horario in range(5):
                 for dia in range(5):
+                    horariosAtualizados[horario][dia] = campos[horario][dia].get()
 
-                    atividade = campos[horario][dia].get()
-
-                    if atividade:
-                        estudante.grade.adicionarHorario(
-                            horario, dia, atividade
-                        )
-                    else:
-                        estudante.grade.removerHorario(
-                            horario, dia
-                        )
-
-            mensagem.config(
-                text="Grade de estudos salva com sucesso!",
-                fg="#3b9875"
+            sucesso = salvarGradeBanco(
+                estudante.id_estudante,
+                horariosAtualizados
             )
 
-        except Exception as erro:
-            print("Erro ao salvar a grade:", erro)
+            if sucesso:
+                mensagem.config(
+                    text="Grade salva com sucesso!",
+                    fg="#3b9875"
+                )
+            else:
+                mensagem.config(
+                    text="Erro ao salvar a grade no banco de dados.",
+                    fg="#cf5c66"
+                )
 
+        except Exception as erro:
+            print("Erro ao salvar grade:", erro)
             mensagem.config(
-                text="Não foi possível salvar a grade.",
+                text="Ocorreu um erro ao salvar a grade.",
                 fg="#cf5c66"
             )
 

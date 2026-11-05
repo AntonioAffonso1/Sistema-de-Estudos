@@ -4,9 +4,9 @@ import tkinter as tk
 from servicos.tarefas import (
     listarTarefas,
     adicionarTarefa as salvarTarefa,
-    editarTarefa,
-    concluirTarefa,
-    excluirTarefa
+    editarTarefa as atualizarTarefaBanco,
+    concluirTarefa as concluirTarefaBanco,
+    excluirTarefa as excluirTarefaBanco
 )
 
 AZUL_PRINCIPAL = "#182c73"
@@ -235,6 +235,7 @@ def telaTarefas(janela, estudante):
 
     listaTarefas.bind("<<ListboxSelect>>", selecionarTarefa)
 
+    
     def editarTarefa():
         try:
             selecao = listaTarefas.curselection()
@@ -256,31 +257,48 @@ def telaTarefas(janela, estudante):
             indice = selecao[0]
             tarefa = estudante.tarefas[indice]
 
-            tarefa.editar(
+            disciplinaEncontrada = None
+
+            for item in estudante.disciplinas:
+                if item.nome.lower() == disciplina.lower():
+                    disciplinaEncontrada = item
+                    break
+
+            if disciplinaEncontrada is None:
+                mensagem.config(
+                    text="Disciplina não encontrada. Verifique o nome."
+                )
+                return
+
+            sucesso = atualizarTarefaBanco(
+                tarefa.id_tarefa,
                 nome,
                 descricao,
-                disciplina,
+                disciplinaEncontrada.id,
                 prioridade,
-                prazo
+                prazo,
+                estudante.id_estudante
             )
 
-            atualizarLista()
-            limparCampos()
+            if sucesso:
+                atualizarLista()
+                limparCampos()
 
-            mensagem.config(
-                text="Tarefa editada com sucesso!",
-                fg="#3b9875"
-            )
+                mensagem.config(
+                    text="Tarefa editada com sucesso!",
+                    fg="#3b9875"
+                )
+            else:
+                mensagem.config(
+                    text="Não foi possível editar a tarefa."
+                )
 
         except Exception as erro:
             print("Erro ao editar tarefa:", erro)
-            mensagem.config(text="Não foi possível editar a tarefa.")
-            selecao = listaTarefas.curselection()
+            mensagem.config(text="Ocorreu um erro ao editar a tarefa.")
 
-            if not selecao:
-                mensagem.config(text="Selecione uma tarefa para editar.")
-                return
 
+    
     def concluirTarefa():
         try:
             selecao = listaTarefas.curselection()
@@ -292,33 +310,32 @@ def telaTarefas(janela, estudante):
             indice = selecao[0]
             tarefa = estudante.tarefas[indice]
 
-            tarefa.concluir()
+            if tarefa.status == "Concluída":
+                mensagem.config(text="Esta tarefa já foi concluída.")
+                return
 
-            atualizarLista()
-
-            mensagem.config(
-                text="Tarefa concluída!",
-                fg="#3b9875"
+            sucesso = concluirTarefaBanco(
+                tarefa.id_tarefa,
+                estudante.id_estudante
             )
+
+            if sucesso:
+                atualizarLista()
+
+                mensagem.config(
+                    text="Tarefa concluída!",
+                    fg="#3b9875"
+                )
+            else:
+                mensagem.config(
+                    text="Não foi possível concluir a tarefa."
+                )
 
         except Exception as erro:
             print("Erro ao concluir tarefa:", erro)
-            mensagem.config(text="Não foi possível concluir a tarefa.")
-            selecao = listaTarefas.curselection()
+            mensagem.config(text="Ocorreu um erro ao concluir a tarefa.")
 
-            if not selecao:
-                mensagem.config(text="Selecione uma tarefa.")
-                return
-
-            indice = selecao[0]
-            tarefa = estudante.tarefas[indice]
-
-            tarefa.concluir()
-
-            atualizarLista()
-
-            mensagem.config(text="Tarefa concluída!", fg="#3b9875")
-
+    
     def excluirTarefa():
         try:
             selecao = listaTarefas.curselection()
@@ -328,20 +345,29 @@ def telaTarefas(janela, estudante):
                 return
 
             indice = selecao[0]
+            tarefa = estudante.tarefas[indice]
 
-            estudante.tarefas.pop(indice)
-
-            atualizarLista()
-            limparCampos()
-
-            mensagem.config(
-                text="Tarefa excluída com sucesso!",
-                fg="#3b9875"
+            sucesso = excluirTarefaBanco(
+                tarefa.id_tarefa,
+                estudante.id_estudante
             )
+
+            if sucesso:
+                atualizarLista()
+                limparCampos()
+
+                mensagem.config(
+                    text="Tarefa excluída com sucesso!",
+                    fg="#3b9875"
+                )
+            else:
+                mensagem.config(
+                    text="Não foi possível excluir a tarefa."
+                )
 
         except Exception as erro:
             print("Erro ao excluir tarefa:", erro)
-            mensagem.config(text="Não foi possível excluir a tarefa.")
+            mensagem.config(text="Ocorreu um erro ao excluir a tarefa.")
 
     # Botões de operações
     botoes = tk.Frame(areaLista, bg=BRANCO)
