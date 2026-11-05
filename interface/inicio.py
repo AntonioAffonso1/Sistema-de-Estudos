@@ -1,6 +1,13 @@
 
 import tkinter as tk
 
+from servicos.disciplinas import listarDisciplinas
+from servicos.tarefas import listarTarefas
+from servicos.resumos import listarResumos
+from servicos.flashcards import listarFlashcards
+
+
+# Cores
 AZUL_PRINCIPAL = "#182c73"
 AZUL_SECUNDARIO = "#15255e"
 AZUL_BOTOES = "#3d4c82"
@@ -11,11 +18,46 @@ TEXTO = "#202a44"
 
 def telaInicio(janela, estudante):
 
-    # Limpa os componentes da tela anterior
+    # Preparação da tela
     for componente in janela.winfo_children():
         componente.destroy()
 
     janela.configure(bg=FUNDO)
+
+    # Carrega os dados
+    estudante.disciplinas = listarDisciplinas(estudante.id_estudante)
+    estudante.tarefas = listarTarefas(estudante.id_estudante)
+    estudante.resumos = listarResumos(estudante.id_estudante)
+    estudante.flashcards = listarFlashcards(estudante.id_estudante)
+
+    # Funções dos botões
+    def abrirDisciplinas():
+        from interface.disciplinas import telaDisciplinas
+        telaDisciplinas(janela, estudante)
+
+    def abrirTarefas():
+        from interface.tarefas import telaTarefas
+        telaTarefas(janela, estudante)
+
+    def abrirGrade():
+        from interface.grade import telaGrade
+        telaGrade(janela, estudante)
+
+    def abrirEstatisticas():
+        from interface.estatisticas import telaEstatisticas
+        telaEstatisticas(janela, estudante)
+
+    def abrirResumos():
+        from interface.resumos import telaResumos
+        telaResumos(janela, estudante)
+
+    def abrirFlashcards():
+        from interface.flashcards import telaFlashcards
+        telaFlashcards(janela, estudante)
+
+    def sair():
+        from interface.login import telaLogin
+        telaLogin(janela)
 
     # Cabeçalho
     cabecalho = tk.Frame(
@@ -34,34 +76,6 @@ def telaInicio(janela, estudante):
         fg=BRANCO
     )
     titulo.pack(side="left", padx=30, pady=25)
-
-    def abrirTarefas():
-        from interface.tarefas import telaTarefas
-        telaTarefas(janela, estudante)
-
-    def abrirGrade():
-        from interface.grade import telaGrade
-        telaGrade(janela, estudante)
-
-    def sair():
-        from interface.login import telaLogin
-        telaLogin(janela)
-
-    def abrirEstatisticas():
-        from interface.estatisticas import telaEstatisticas
-        telaEstatisticas(janela, estudante)
-
-    def abrirDisciplinas():
-        from interface.disciplinas import telaDisciplinas
-        telaDisciplinas(janela, estudante)
-
-    def abrirResumos():
-        from interface.resumos import telaResumos
-        telaResumos(janela, estudante)
-
-    def abrirFlashcards():
-        from interface.flashcards import telaFlashcards
-        telaFlashcards(janela, estudante)
 
     botaoSair = tk.Button(
         cabecalho,
@@ -100,11 +114,28 @@ def telaInicio(janela, estudante):
     )
     descricao.pack(anchor="w", pady=(0, 30))
 
-    # Área dos menus
+    # Botões do menu
     menus = tk.Frame(conteudo, bg=FUNDO)
-    menus.pack(fill="x")
+    menus.pack(expand=True)
 
-    # Botão de tarefas
+    menus.grid_columnconfigure(0, weight=1)
+    menus.grid_columnconfigure(1, weight=1)
+    menus.grid_columnconfigure(2, weight=1)
+
+    botaoDisciplinas = tk.Button(
+        menus,
+        text="Minhas disciplinas",
+        font=("Arial", 13, "bold"),
+        bg=BRANCO,
+        fg=AZUL_PRINCIPAL,
+        width=25,
+        height=4,
+        relief="flat",
+        cursor="hand2",
+        command=abrirDisciplinas
+    )
+    botaoDisciplinas.grid(row=0, column=0, padx=10, pady=10)
+
     botaoTarefas = tk.Button(
         menus,
         text="Minhas tarefas",
@@ -117,9 +148,8 @@ def telaInicio(janela, estudante):
         cursor="hand2",
         command=abrirTarefas
     )
-    botaoTarefas.grid(row=0, column=0, padx=10, pady=10)
+    botaoTarefas.grid(row=0, column=1, padx=10, pady=10)
 
-    # Botão da grade
     botaoGrade = tk.Button(
         menus,
         text="Grade de estudos",
@@ -132,9 +162,8 @@ def telaInicio(janela, estudante):
         cursor="hand2",
         command=abrirGrade
     )
-    botaoGrade.grid(row=0, column=1, padx=10, pady=10)
+    botaoGrade.grid(row=0, column=2, padx=10, pady=10)
 
-    # Botão de estatísticas
     botaoEstatisticas = tk.Button(
         menus,
         text="Estatísticas",
@@ -149,22 +178,6 @@ def telaInicio(janela, estudante):
     )
     botaoEstatisticas.grid(row=1, column=0, padx=10, pady=10)
 
-        # Botão de disciplinas
-    botaoDisciplinas = tk.Button(
-        menus,
-        text="Minhas disciplinas",
-        font=("Arial", 13, "bold"),
-        bg=BRANCO,
-        fg=AZUL_PRINCIPAL,
-        width=25,
-        height=4,
-        relief="flat",
-        cursor="hand2",
-        command=abrirDisciplinas
-    )
-    botaoDisciplinas.grid(row=1, column=1, padx=10, pady=10)
-
-        # Botão de resumos
     botaoResumos = tk.Button(
         menus,
         text="Meus resumos",
@@ -177,7 +190,7 @@ def telaInicio(janela, estudante):
         cursor="hand2",
         command=abrirResumos
     )
-    botaoResumos.grid(row=2, column=0, padx=10, pady=10)
+    botaoResumos.grid(row=1, column=1, padx=10, pady=10)
 
     botaoFlashcards = tk.Button(
         menus,
@@ -191,11 +204,4 @@ def telaInicio(janela, estudante):
         cursor="hand2",
         command=abrirFlashcards
     )
-
-    botaoFlashcards.grid(
-        row=2,
-        column=1,
-        padx=10,
-        pady=10
-    )
-
+    botaoFlashcards.grid(row=1, column=2, padx=10, pady=10)

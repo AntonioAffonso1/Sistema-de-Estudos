@@ -4,10 +4,10 @@ import tkinter as tk
 from servicos.autenticacao import login
 
 
+# Cores
 AZUL_PRINCIPAL = "#182c73"
 AZUL_SECUNDARIO = "#15255e"
 AZUL_BOTOES = "#3d4c82"
-
 FUNDO = "#f4f6fb"
 BRANCO = "#ffffff"
 TEXTO = "#202a44"
@@ -15,13 +15,35 @@ TEXTO = "#202a44"
 
 def telaLogin(janela):
 
-    # Limpar conteúdo anterior da janela
+    # Preparação da tela
     for componente in janela.winfo_children():
         componente.destroy()
 
     janela.configure(bg=FUNDO)
 
-    # Área central
+    # Funções
+    def abrirCadastro():
+        from interface.cadastro import telaCadastro
+        telaCadastro(janela)
+
+    def verificarLogin():
+
+        email = campoEmail.get()
+        senha = campoSenha.get()
+
+        if not email or not senha:
+            mensagem.config(text="Preencha todos os campos.")
+            return
+
+        estudante = login(email, senha)
+
+        if estudante is not None:
+            from interface.inicio import telaInicio
+            telaInicio(janela, estudante)
+        else:
+            mensagem.config(text="E-mail ou senha incorretos.")
+
+    # Quadro principal
     quadro = tk.Frame(
         janela,
         bg=BRANCO,
@@ -30,7 +52,6 @@ def telaLogin(janela):
     )
     quadro.place(relx=0.5, rely=0.5, anchor="center")
 
-    # Título
     titulo = tk.Label(
         quadro,
         text="Sistema de Estudos",
@@ -49,7 +70,7 @@ def telaLogin(janela):
     )
     descricao.pack(pady=(0, 25))
 
-    # Campo de e-mail
+    # Campos de login
     tk.Label(
         quadro,
         text="E-mail",
@@ -65,7 +86,6 @@ def telaLogin(janela):
     )
     campoEmail.pack(pady=(5, 15))
 
-    # Campo de senha
     tk.Label(
         quadro,
         text="Senha",
@@ -82,7 +102,7 @@ def telaLogin(janela):
     )
     campoSenha.pack(pady=(5, 20))
 
-    # Mensagem de retorno
+    # Mensagem
     mensagem = tk.Label(
         quadro,
         text="",
@@ -92,30 +112,7 @@ def telaLogin(janela):
     )
     mensagem.pack()
 
-    # Função de abrir tela de cadastro
-    def abrirCadastro():
-        from interface.cadastro import telaCadastro
-        telaCadastro(janela)
-
-    # Função do botão
-    def verificarLogin():
-
-        email = campoEmail.get()
-        senha = campoSenha.get()
-
-        if not email or not senha:
-            mensagem.config(text="Preencha todos os campos.")
-            return
-
-        estudante = login(email, senha)
-
-        if estudante is not None:
-            from interface.inicio import telaInicio
-            telaInicio(janela, estudante)
-        else:
-            mensagem.config(text="E-mail ou senha incorretos.")
-
-    # Botão de login
+    # Botões
     botaoLogin = tk.Button(
         quadro,
         text="Entrar",

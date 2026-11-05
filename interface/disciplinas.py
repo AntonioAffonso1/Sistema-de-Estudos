@@ -8,8 +8,8 @@ from servicos.disciplinas import (
     excluirDisciplina as removerDisciplina
 )
 
-from tkinter import messagebox
 
+# Cores
 AZUL_PRINCIPAL = "#182c73"
 AZUL_SECUNDARIO = "#15255e"
 AZUL_BOTOES = "#3d4c82"
@@ -20,11 +20,165 @@ TEXTO = "#202a44"
 
 def telaDisciplinas(janela, estudante):
 
-    # Limpa a tela anterior
+    # Preparação da tela
     for componente in janela.winfo_children():
         componente.destroy()
 
     janela.configure(bg=FUNDO)
+
+    # Funções
+    def voltar():
+        from interface.inicio import telaInicio
+        telaInicio(janela, estudante)
+
+    def atualizarLista():
+        estudante.disciplinas = listarDisciplinas(
+            estudante.id_estudante
+        )
+
+        listaDisciplinas.delete(0, tk.END)
+
+        for disciplina in estudante.disciplinas:
+            listaDisciplinas.insert(
+                tk.END,
+                f"{disciplina.id} | {disciplina.nome} | {disciplina.descricao}"
+            )
+
+    def limparCampos():
+        campoNome.delete(0, tk.END)
+        campoDescricao.delete(0, tk.END)
+
+    def adicionarDisciplina():
+        try:
+            nome = campoNome.get().strip()
+            descricao = campoDescricao.get().strip()
+
+            if not nome or not descricao:
+                mensagem.config(
+                    text="Preencha todos os campos.",
+                    fg="#cf5c66"
+                )
+                return
+
+            resultado = salvarDisciplina(
+                nome,
+                descricao,
+                estudante.id_estudante
+            )
+
+            if resultado:
+                atualizarLista()
+                limparCampos()
+
+                mensagem.config(
+                    text="Disciplina cadastrada com sucesso!",
+                    fg="#3b9875"
+                )
+            else:
+                mensagem.config(
+                    text="Não foi possível cadastrar a disciplina.",
+                    fg="#cf5c66"
+                )
+
+        except Exception as erro:
+            print("Erro ao cadastrar disciplina:", erro)
+            mensagem.config(
+                text="Não foi possível cadastrar a disciplina.",
+                fg="#cf5c66"
+            )
+
+    def editarDisciplina():
+        try:
+            selecao = listaDisciplinas.curselection()
+
+            if not selecao:
+                mensagem.config(
+                    text="Selecione uma disciplina.",
+                    fg="#cf5c66"
+                )
+                return
+
+            nome = campoNome.get().strip()
+            descricao = campoDescricao.get().strip()
+
+            if not nome or not descricao:
+                mensagem.config(
+                    text="Preencha todos os campos.",
+                    fg="#cf5c66"
+                )
+                return
+
+            indice = selecao[0]
+            disciplina = estudante.disciplinas[indice]
+
+            resultado = atualizarDisciplina(
+                disciplina.id,
+                nome,
+                descricao,
+                estudante.id_estudante
+            )
+
+            if resultado:
+                atualizarLista()
+                limparCampos()
+
+                mensagem.config(
+                    text="Disciplina editada com sucesso!",
+                    fg="#3b9875"
+                )
+            else:
+                mensagem.config(
+                    text="Não foi possível editar a disciplina.",
+                    fg="#cf5c66"
+                )
+
+        except Exception as erro:
+            print("Erro ao editar disciplina:", erro)
+            mensagem.config(
+                text="Não foi possível editar a disciplina.",
+                fg="#cf5c66"
+            )
+
+    def excluirDisciplina():
+        try:
+            selecao = listaDisciplinas.curselection()
+
+            if not selecao:
+                mensagem.config(
+                    text="Selecione uma disciplina.",
+                    fg="#cf5c66"
+                )
+                return
+
+            indice = selecao[0]
+            disciplina = estudante.disciplinas[indice]
+
+            resultado = removerDisciplina(
+                disciplina.id,
+                estudante.id_estudante
+            )
+
+            if resultado:
+                atualizarLista()
+                limparCampos()
+
+                mensagem.config(
+                    text="Disciplina excluída com sucesso!",
+                    fg="#3b9875"
+                )
+            else:
+                mensagem.config(
+                    text="Não foi possível excluir. Verifique se existem registros vinculados.",
+                    fg="#cf5c66"
+                )
+
+        except Exception as erro:
+            print("Erro ao excluir disciplina:", erro)
+
+            mensagem.config(
+                text="Não foi possível excluir a disciplina. Ela pode possuir registros vinculados.",
+                fg="#cf5c66"
+            )
 
     # Cabeçalho
     cabecalho = tk.Frame(
@@ -44,10 +198,6 @@ def telaDisciplinas(janela, estudante):
     )
     titulo.pack(side="left", padx=30, pady=20)
 
-    def voltar():
-        from interface.inicio import telaInicio
-        telaInicio(janela, estudante)
-
     botaoVoltar = tk.Button(
         cabecalho,
         text="Voltar",
@@ -64,7 +214,7 @@ def telaDisciplinas(janela, estudante):
     conteudo = tk.Frame(janela, bg=FUNDO)
     conteudo.pack(fill="both", expand=True, padx=30, pady=20)
 
-    # Área do formulário
+    # Formulário
     quadroFormulario = tk.Frame(
         conteudo,
         bg=BRANCO,
@@ -133,6 +283,7 @@ def telaDisciplinas(janela, estudante):
     )
     listaDisciplinas.pack(fill="both", expand=True)
 
+    # Mensagem
     mensagem = tk.Label(
         conteudo,
         text="",
@@ -140,168 +291,6 @@ def telaDisciplinas(janela, estudante):
         bg=FUNDO
     )
     mensagem.pack(pady=5)
-
-    # Atualiza a lista
-    
-    # Atualiza a lista consultando o Oracle
-    def atualizarLista():
-
-        estudante.disciplinas = listarDisciplinas(
-            estudante.id_estudante
-        )
-
-        listaDisciplinas.delete(0, tk.END)
-
-        for disciplina in estudante.disciplinas:
-            listaDisciplinas.insert(
-                tk.END,
-                f"{disciplina.id} | {disciplina.nome} | {disciplina.descricao}"
-            )
-
-    # Limpa os campos
-    def limparCampos():
-
-        campoNome.delete(0, tk.END)
-        campoDescricao.delete(0, tk.END)
-
-    # Adiciona uma disciplina
-    def adicionarDisciplina():
-
-        try:
-            nome = campoNome.get().strip()
-            descricao = campoDescricao.get().strip()
-
-            if not nome or not descricao:
-                mensagem.config(
-                    text="Preencha todos os campos.",
-                    fg="#cf5c66"
-                )
-                return
-
-            resultado = salvarDisciplina(
-                nome,
-                descricao,
-                estudante.id_estudante
-            )
-
-            if resultado:
-                atualizarLista()
-                limparCampos()
-
-                mensagem.config(
-                    text="Disciplina cadastrada com sucesso!",
-                    fg="#3b9875"
-                )
-            else:
-                mensagem.config(
-                    text="Não foi possível cadastrar a disciplina.",
-                    fg="#cf5c66"
-                )
-
-        except Exception as erro:
-            print("Erro ao cadastrar disciplina:", erro)
-            mensagem.config(
-                text="Não foi possível cadastrar a disciplina.",
-                fg="#cf5c66"
-            )
-
-    # Edita uma disciplina
-    def editarDisciplina():
-
-        try:
-            selecao = listaDisciplinas.curselection()
-
-            if not selecao:
-                mensagem.config(
-                    text="Selecione uma disciplina.",
-                    fg="#cf5c66"
-                )
-                return
-
-            nome = campoNome.get().strip()
-            descricao = campoDescricao.get().strip()
-
-            if not nome or not descricao:
-                mensagem.config(
-                    text="Preencha todos os campos.",
-                    fg="#cf5c66"
-                )
-                return
-
-            indice = selecao[0]
-            disciplina = estudante.disciplinas[indice]
-
-            resultado = atualizarDisciplina(
-                disciplina.id,
-                nome,
-                descricao,
-                estudante.id_estudante
-            )
-
-            if resultado:
-                atualizarLista()
-                limparCampos()
-
-                mensagem.config(
-                    text="Disciplina editada com sucesso!",
-                    fg="#3b9875"
-                )
-            else:
-                mensagem.config(
-                    text="Não foi possível editar a disciplina.",
-                    fg="#cf5c66"
-                )
-
-        except Exception as erro:
-            print("Erro ao editar disciplina:", erro)
-            mensagem.config(
-                text="Não foi possível editar a disciplina.",
-                fg="#cf5c66"
-            )
-
-    # Exclui uma disciplina
-    def excluirDisciplina():
-
-        try:
-            selecao = listaDisciplinas.curselection()
-
-            if not selecao:
-                mensagem.config(
-                    text="Selecione uma disciplina.",
-                    fg="#cf5c66"
-                )
-                return
-
-            indice = selecao[0]
-            disciplina = estudante.disciplinas[indice]
-
-            resultado = removerDisciplina(
-                disciplina.id,
-                estudante.id_estudante
-            )
-
-            if resultado:
-                atualizarLista()
-                limparCampos()
-
-                mensagem.config(
-                    text="Disciplina excluída com sucesso!",
-                    fg="#3b9875"
-                )
-            else:
-                mensagem.config(
-                    text="Não foi possível excluir. Verifique se existem registros vinculados.",
-                    fg="#cf5c66"
-                )
-
-        except Exception as erro:
-            print("Erro ao excluir disciplina:", erro)
-
-            mensagem.config(
-                text="Não foi possível excluir a disciplina. Ela pode possuir registros vinculados.",
-                fg="#cf5c66"
-            )
-
 
     # Botões
     botoes = tk.Frame(conteudo, bg=FUNDO)

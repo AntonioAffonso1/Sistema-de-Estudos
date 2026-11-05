@@ -8,7 +8,7 @@ def conectar():
             dsn="localhost:1521/XEPDB1"
         )
 
-        print("Conexao com Oracle realizada com sucesso!")
+
         return conexao
 
     except Exception as erro:

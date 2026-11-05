@@ -1,7 +1,7 @@
 
 import tkinter as tk
 
-from classes.resumo import Resumo
+from servicos.disciplinas import listarDisciplinas
 
 from servicos.resumos import (
     listarResumos,
@@ -10,6 +10,8 @@ from servicos.resumos import (
     excluirResumo as removerResumoBanco
 )
 
+
+# Cores
 AZUL_PRINCIPAL = "#182c73"
 AZUL_SECUNDARIO = "#15255e"
 AZUL_BOTOES = "#3d4c82"
@@ -20,161 +22,22 @@ TEXTO = "#202a44"
 
 def telaResumos(janela, estudante):
 
-    # Limpa a tela anterior
+    # Preparação da tela
     for componente in janela.winfo_children():
         componente.destroy()
 
     janela.configure(bg=FUNDO)
-    
-    from servicos.disciplinas import listarDisciplinas
 
+    # Carrega os dados
     estudante.disciplinas = listarDisciplinas(estudante.id_estudante)
     estudante.resumos = listarResumos(estudante.id_estudante)
-    # Cabeçalho
-    cabecalho = tk.Frame(
-        janela,
-        bg=AZUL_PRINCIPAL,
-        height=75
-    )
-    cabecalho.pack(fill="x")
-    cabecalho.pack_propagate(False)
 
-    tk.Label(
-        cabecalho,
-        text="Meus resumos",
-        font=("Arial", 20, "bold"),
-        bg=AZUL_PRINCIPAL,
-        fg=BRANCO
-    ).pack(side="left", padx=30, pady=20)
-
+    # Funções
     def voltar():
         from interface.inicio import telaInicio
         telaInicio(janela, estudante)
 
-    tk.Button(
-        cabecalho,
-        text="Voltar",
-        font=("Arial", 10, "bold"),
-        bg=AZUL_BOTOES,
-        fg=BRANCO,
-        relief="flat",
-        cursor="hand2",
-        command=voltar
-    ).pack(side="right", padx=30, pady=20)
-
-    # Conteúdo principal
-    conteudo = tk.Frame(janela, bg=FUNDO)
-    conteudo.pack(fill="both", expand=True, padx=30, pady=20)
-
-    # Formulário
-    quadroFormulario = tk.Frame(
-        conteudo,
-        bg=BRANCO,
-        padx=20,
-        pady=10
-    )
-    quadroFormulario.pack(fill="x", pady=10)
-
-    tk.Label(
-        quadroFormulario,
-        text="Cadastrar resumo",
-        font=("Arial", 15, "bold"),
-        bg=BRANCO,
-        fg=AZUL_PRINCIPAL
-    ).pack(anchor="w", pady=(0, 10))
-
-    tk.Label(
-        quadroFormulario,
-        text="Título:",
-        bg=BRANCO,
-        fg=TEXTO
-    ).pack(anchor="w")
-
-    campoTitulo = tk.Entry(
-        quadroFormulario,
-        font=("Arial", 11)
-    )
-    campoTitulo.pack(fill="x", pady=(3, 10), ipady=5)
-
-    tk.Label(
-        quadroFormulario,
-        text="Conteúdo:",
-        bg=BRANCO,
-        fg=TEXTO
-    ).pack(anchor="w")
-
-    campoConteudo = tk.Text(
-        quadroFormulario,
-        font=("Arial", 10),
-        height=3,
-        wrap="word"
-    )
-    campoConteudo.pack(fill="x", pady=(3, 10))
-
-    tk.Label(
-        quadroFormulario,
-        text="Disciplina:",
-        bg=BRANCO,
-        fg=TEXTO
-    ).pack(anchor="w")
-
-    nomesDisciplinas = [disciplina.nome for disciplina in estudante.disciplinas]
-
-    if not nomesDisciplinas:
-        nomesDisciplinas = ["Nenhuma disciplina cadastrada"]
-
-    disciplinaSelecionada = tk.StringVar()
-    disciplinaSelecionada.set(nomesDisciplinas[0])
-
-    menuDisciplinas = tk.OptionMenu(
-        quadroFormulario,
-        disciplinaSelecionada,
-        *nomesDisciplinas
-    )
-    menuDisciplinas.config(
-        bg=BRANCO,
-        fg=TEXTO,
-        relief="solid"
-    )
-    menuDisciplinas.pack(anchor="w", pady=(3, 10))
-
-    # Lista de resumos
-    quadroLista = tk.Frame(
-        conteudo,
-        bg=BRANCO,
-        padx=20,
-        pady=10
-    )
-    quadroLista.pack(fill="x", pady=5)
-
-    tk.Label(
-        quadroLista,
-        text="Resumos cadastrados",
-        font=("Arial", 14, "bold"),
-        bg=BRANCO,
-        fg=AZUL_PRINCIPAL
-    ).pack(anchor="w", pady=(0, 10))
-
-    listaResumos = tk.Listbox(
-        quadroLista,
-        font=("Arial", 10),
-        height=4,
-        selectbackground=AZUL_BOTOES,
-        selectforeground=BRANCO
-    )
-    listaResumos.pack(fill="x")
-
-    mensagem = tk.Label(
-        conteudo,
-        text="",
-        font=("Arial", 10),
-        bg=FUNDO
-    )
-    mensagem.pack(pady=5)
-
-    # Atualiza a lista
     def atualizarLista():
-
         listaResumos.delete(0, tk.END)
 
         for resumo in estudante.resumos:
@@ -191,18 +54,14 @@ def telaResumos(janela, estudante):
                 f"{resumo.id_resumo} | {resumo.titulo} | {nomeDisciplina}"
             )
 
-    # Limpa os campos
     def limparCampos():
-
         campoTitulo.delete(0, tk.END)
         campoConteudo.delete("1.0", tk.END)
 
         if nomesDisciplinas:
             disciplinaSelecionada.set(nomesDisciplinas[0])
 
-    # Seleciona um resumo
     def selecionarResumo(evento):
-
         try:
             selecao = listaResumos.curselection()
 
@@ -225,15 +84,7 @@ def telaResumos(janela, estudante):
         except Exception as erro:
             print("Erro ao selecionar resumo:", erro)
 
-    listaResumos.bind(
-        "<<ListboxSelect>>",
-        selecionarResumo
-    )
-
-    # Adiciona um resumo
-    
     def adicionarResumo():
-
         try:
             if not estudante.disciplinas:
                 mensagem.config(
@@ -297,9 +148,7 @@ def telaResumos(janela, estudante):
                 fg="#cf5c66"
             )
 
-    # Edita um resumo
     def editarResumo():
-
         try:
             selecao = listaResumos.curselection()
 
@@ -368,9 +217,7 @@ def telaResumos(janela, estudante):
                 fg="#cf5c66"
             )
 
-    # Exclui um resumo
     def excluirResumo():
-
         try:
             selecao = listaResumos.curselection()
 
@@ -411,6 +258,153 @@ def telaResumos(janela, estudante):
                 text="Não foi possível excluir o resumo.",
                 fg="#cf5c66"
             )
+
+    # Cabeçalho
+    cabecalho = tk.Frame(
+        janela,
+        bg=AZUL_PRINCIPAL,
+        height=75
+    )
+    cabecalho.pack(fill="x")
+    cabecalho.pack_propagate(False)
+
+    tk.Label(
+        cabecalho,
+        text="Meus resumos",
+        font=("Arial", 20, "bold"),
+        bg=AZUL_PRINCIPAL,
+        fg=BRANCO
+    ).pack(side="left", padx=30, pady=20)
+
+    tk.Button(
+        cabecalho,
+        text="Voltar",
+        font=("Arial", 10, "bold"),
+        bg=AZUL_BOTOES,
+        fg=BRANCO,
+        relief="flat",
+        cursor="hand2",
+        command=voltar
+    ).pack(side="right", padx=30, pady=20)
+
+    # Conteúdo principal
+    conteudo = tk.Frame(janela, bg=FUNDO)
+    conteudo.pack(fill="both", expand=True, padx=30, pady=20)
+
+    # Formulário
+    quadroFormulario = tk.Frame(
+        conteudo,
+        bg=BRANCO,
+        padx=20,
+        pady=10
+    )
+    quadroFormulario.pack(fill="x", pady=10)
+
+    tk.Label(
+        quadroFormulario,
+        text="Cadastrar resumo",
+        font=("Arial", 15, "bold"),
+        bg=BRANCO,
+        fg=AZUL_PRINCIPAL
+    ).pack(anchor="w", pady=(0, 10))
+
+    tk.Label(
+        quadroFormulario,
+        text="Título:",
+        bg=BRANCO,
+        fg=TEXTO
+    ).pack(anchor="w")
+
+    campoTitulo = tk.Entry(
+        quadroFormulario,
+        font=("Arial", 11)
+    )
+    campoTitulo.pack(fill="x", pady=(3, 10), ipady=5)
+
+    tk.Label(
+        quadroFormulario,
+        text="Conteúdo:",
+        bg=BRANCO,
+        fg=TEXTO
+    ).pack(anchor="w")
+
+    campoConteudo = tk.Text(
+        quadroFormulario,
+        font=("Arial", 10),
+        height=3,
+        wrap="word"
+    )
+    campoConteudo.pack(fill="x", pady=(3, 10))
+
+    # Seleção de disciplina
+    tk.Label(
+        quadroFormulario,
+        text="Disciplina:",
+        bg=BRANCO,
+        fg=TEXTO
+    ).pack(anchor="w")
+
+    nomesDisciplinas = [
+        disciplina.nome for disciplina in estudante.disciplinas
+    ]
+
+    if not nomesDisciplinas:
+        nomesDisciplinas = ["Nenhuma disciplina cadastrada"]
+
+    disciplinaSelecionada = tk.StringVar()
+    disciplinaSelecionada.set(nomesDisciplinas[0])
+
+    menuDisciplinas = tk.OptionMenu(
+        quadroFormulario,
+        disciplinaSelecionada,
+        *nomesDisciplinas
+    )
+    menuDisciplinas.config(
+        bg=BRANCO,
+        fg=TEXTO,
+        relief="solid"
+    )
+    menuDisciplinas.pack(anchor="w", pady=(3, 10))
+
+    # Lista de resumos
+    quadroLista = tk.Frame(
+        conteudo,
+        bg=BRANCO,
+        padx=20,
+        pady=10
+    )
+    quadroLista.pack(fill="x", pady=5)
+
+    tk.Label(
+        quadroLista,
+        text="Resumos cadastrados",
+        font=("Arial", 14, "bold"),
+        bg=BRANCO,
+        fg=AZUL_PRINCIPAL
+    ).pack(anchor="w", pady=(0, 10))
+
+    listaResumos = tk.Listbox(
+        quadroLista,
+        font=("Arial", 10),
+        height=4,
+        selectbackground=AZUL_BOTOES,
+        selectforeground=BRANCO
+    )
+    listaResumos.pack(fill="x")
+
+    # Mensagem
+    mensagem = tk.Label(
+        conteudo,
+        text="",
+        font=("Arial", 10),
+        bg=FUNDO
+    )
+    mensagem.pack(pady=5)
+
+    listaResumos.bind(
+        "<<ListboxSelect>>",
+        selecionarResumo
+    )
 
     # Botões
     botoes = tk.Frame(conteudo, bg=FUNDO)

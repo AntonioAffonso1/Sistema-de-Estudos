@@ -1,5 +1,6 @@
 
 import tkinter as tk
+from servicos.tarefas import listarTarefas
 
 AZUL_PRINCIPAL = "#182c73"
 AZUL_BOTOES = "#3d4c82"
@@ -15,6 +16,7 @@ def telaEstatisticas(janela, estudante):
         componente.destroy()
 
     janela.configure(bg=FUNDO)
+    estudante.tarefas = listarTarefas(estudante.id_estudante)
 
     # Cabeçalho
     cabecalho = tk.Frame(janela, bg=AZUL_PRINCIPAL, height=75)
@@ -59,11 +61,11 @@ def telaEstatisticas(janela, estudante):
     ).pack(anchor="w", pady=(0, 20))
 
     # Calcula as quantidades
-        # Calcula as quantidades
     try:
         total = len(estudante.tarefas)
         concluidas = 0
         pendentes = 0
+        emAndamento = 0
 
         disciplinas = {}
 
@@ -71,8 +73,11 @@ def telaEstatisticas(janela, estudante):
 
             if tarefa.status == "Concluída":
                 concluidas += 1
-            else:
+
+            elif tarefa.status == "Pendente":
                 pendentes += 1
+            elif tarefa.status == "Em andamento":
+                emAndamento += 1
 
             if tarefa.disciplina in disciplinas:
                 disciplinas[tarefa.disciplina] += 1
@@ -90,6 +95,7 @@ def telaEstatisticas(janela, estudante):
         total = 0
         concluidas = 0
         pendentes = 0
+        emAndamento = 0
         disciplinas = {}
         percentual = 0
         
@@ -134,7 +140,10 @@ def telaEstatisticas(janela, estudante):
     criarIndicador(
         indicadores, "Pendentes", pendentes, "#cf5c66"
     ).pack(side="left", fill="both", expand=True, padx=5)
-
+    
+    criarIndicador(
+        indicadores, "Em andamento", emAndamento, "#d69b36"
+    ).pack(side="left", fill="both", expand=True, padx=5)
     # Percentual de conclusão
     quadroProgresso = tk.Frame(
         conteudo,
@@ -179,7 +188,7 @@ def telaEstatisticas(janela, estudante):
         relx=0,
         rely=0,
         relheight=1,
-        relwidth=percentual / 100
+        relwidth=min(percentual, 100) / 100
     )
 
     # Distribuição por disciplina

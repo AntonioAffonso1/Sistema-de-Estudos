@@ -1,7 +1,10 @@
 
 import tkinter as tk
+
 from servicos.autenticacao import cadastro
 
+
+# Cores
 AZUL_PRINCIPAL = "#182c73"
 AZUL_SECUNDARIO = "#15255e"
 AZUL_BOTOES = "#3d4c82"
@@ -12,13 +15,57 @@ TEXTO = "#202a44"
 
 def telaCadastro(janela):
 
-    # Limpa os componentes da tela anterior
+    # Preparação da tela
     for componente in janela.winfo_children():
         componente.destroy()
 
     janela.configure(bg=FUNDO)
 
-    quadro = tk.Frame(janela, bg=BRANCO, padx=40, pady=35)
+    # Funções
+    def realizarCadastro():
+        nome = campoNome.get()
+        email = campoEmail.get()
+        senha = campoSenha.get()
+        confirmarSenha = campoConfirmarSenha.get()
+
+        if not nome or not email or not senha or not confirmarSenha:
+            mensagem.config(
+                text="Preencha todos os campos.",
+                fg="#cf5c66"
+            )
+            return
+
+        if senha != confirmarSenha:
+            mensagem.config(
+                text="As senhas não correspondem.",
+                fg="#cf5c66"
+            )
+            return
+
+        resultado = cadastro(nome, email, senha)
+
+        if resultado:
+            mensagem.config(
+                text="Cadastro realizado com sucesso!",
+                fg="#3b9875"
+            )
+        else:
+            mensagem.config(
+                text="Este e-mail já está cadastrado.",
+                fg="#cf5c66"
+            )
+
+    def voltarLogin():
+        from interface.login import telaLogin
+        telaLogin(janela)
+
+    # Quadro principal
+    quadro = tk.Frame(
+        janela,
+        bg=BRANCO,
+        padx=40,
+        pady=35
+    )
     quadro.place(relx=0.5, rely=0.5, anchor="center")
 
     titulo = tk.Label(
@@ -39,46 +86,70 @@ def telaCadastro(janela):
     )
     descricao.pack(pady=(0, 20))
 
-    # Nome
+    # Campos de cadastro
     tk.Label(
-        quadro, text="Nome completo",
-        font=("Arial", 11), bg=BRANCO, fg=TEXTO
+        quadro,
+        text="Nome completo",
+        font=("Arial", 11),
+        bg=BRANCO,
+        fg=TEXTO
     ).pack(anchor="w")
 
-    campoNome = tk.Entry(quadro, font=("Arial", 12), width=30)
+    campoNome = tk.Entry(
+        quadro,
+        font=("Arial", 12),
+        width=30
+    )
     campoNome.pack(pady=(5, 12))
 
-    # E-mail
     tk.Label(
-        quadro, text="E-mail",
-        font=("Arial", 11), bg=BRANCO, fg=TEXTO
+        quadro,
+        text="E-mail",
+        font=("Arial", 11),
+        bg=BRANCO,
+        fg=TEXTO
     ).pack(anchor="w")
 
-    campoEmail = tk.Entry(quadro, font=("Arial", 12), width=30)
+    campoEmail = tk.Entry(
+        quadro,
+        font=("Arial", 12),
+        width=30
+    )
     campoEmail.pack(pady=(5, 12))
 
-    # Senha
     tk.Label(
-        quadro, text="Senha",
-        font=("Arial", 11), bg=BRANCO, fg=TEXTO
+        quadro,
+        text="Senha",
+        font=("Arial", 11),
+        bg=BRANCO,
+        fg=TEXTO
     ).pack(anchor="w")
 
     campoSenha = tk.Entry(
-        quadro, font=("Arial", 12), width=30, show="*"
+        quadro,
+        font=("Arial", 12),
+        width=30,
+        show="*"
     )
     campoSenha.pack(pady=(5, 12))
 
-    # Confirmação de senha
     tk.Label(
-        quadro, text="Confirmar senha",
-        font=("Arial", 11), bg=BRANCO, fg=TEXTO
+        quadro,
+        text="Confirmar senha",
+        font=("Arial", 11),
+        bg=BRANCO,
+        fg=TEXTO
     ).pack(anchor="w")
 
     campoConfirmarSenha = tk.Entry(
-        quadro, font=("Arial", 12), width=30, show="*"
+        quadro,
+        font=("Arial", 12),
+        width=30,
+        show="*"
     )
     campoConfirmarSenha.pack(pady=(5, 12))
 
+    # Mensagem
     mensagem = tk.Label(
         quadro,
         text="",
@@ -88,33 +159,7 @@ def telaCadastro(janela):
     )
     mensagem.pack(pady=5)
 
-    def realizarCadastro():
-        nome = campoNome.get()
-        email = campoEmail.get()
-        senha = campoSenha.get()
-        confirmarSenha = campoConfirmarSenha.get()
-
-        if not nome or not email or not senha or not confirmarSenha:
-            mensagem.config(text="Preencha todos os campos.")
-            return
-
-        if senha != confirmarSenha:
-            mensagem.config(text="As senhas não correspondem.")
-            return
-
-        resultado = cadastro(nome, email, senha)
-
-        if resultado:
-            mensagem.config(
-                text="Cadastro realizado com sucesso!",
-                fg="#3b9875"
-            )
-        else:
-            mensagem.config(
-                text="Este e-mail já está cadastrado.",
-                fg="#cf5c66"
-            )
-
+    # Botões
     botaoCadastrar = tk.Button(
         quadro,
         text="Cadastrar",
@@ -128,10 +173,6 @@ def telaCadastro(janela):
         command=realizarCadastro
     )
     botaoCadastrar.pack(pady=10)
-
-    def voltarLogin():
-        from interface.login import telaLogin
-        telaLogin(janela)
 
     botaoVoltar = tk.Button(
         quadro,
